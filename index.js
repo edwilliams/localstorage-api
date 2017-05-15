@@ -56,7 +56,7 @@ function clear() {
   localStorage.clear()
 }
 
-export default {
+module.exports = {
   get: get,
   set: set,
   has: has,
