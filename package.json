@@ -4,12 +4,15 @@
   "description": "> Access local storage with dot notation (e.g. `ls.get('some.object.here')`)",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "test": "ava --watch --verbose"
   },
   "author": "Ed Williams",
   "license": "ISC",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/edwilliams/localstorage-api"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edwilliams/localstorage-api"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1"
   }
 }
