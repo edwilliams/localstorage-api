@@ -1,50 +1,61 @@
-function IsJsonObj(str) {
-  try { JSON.parse(str) } catch (e) { return false }
-  return true
-}
+var localStorage = {}
 
-function get(str) {
-
-  var arr, strOne, strTwo
-
-  arr = str.split('.')
-
-  strOne = arr[0]
-
-  if ( arr.length === 1 ) {
-    if ( IsJsonObj( localStorage[strOne] ) ) {
-      return JSON.parse(localStorage[strOne])
-    } else {
-      return localStorage[strOne]
+// http://stackoverflow.com/a/20240290/2102042
+function setValue(object, path, value) {
+    var a = path.split('.');
+    var o = object;
+    for (var i = 0; i < a.length - 1; i++) {
+        var n = a[i];
+        if (n in o) {
+            o = o[n];
+        } else {
+            o[n] = {};
+            o = o[n];
+        }
     }
-  }
-
-  strTwo = arr.splice(1).join('.')
-
-  try {
-    return strTwo.split('.').reduce(function(a, b) {
-      return a[b]
-    }, JSON.parse(localStorage[strOne]))
-  } catch (err) {
-    console.warn('invalid key passed to localStorage')
-  }
-
+    o[a[a.length - 1]] = value;
 }
 
-function set(key, val) {
+// http://stackoverflow.com/a/20240290/2102042
+function getValue(object, path) {
+    var o = object;
+    path = path.replace(/\[(\w+)\]/g, '.$1');
+    path = path.replace(/^\./, '');
+    var a = path.split('.');
+    while (a.length) {
+        var n = a.shift();
+        if (n in o) {
+            o = o[n];
+        } else {
+            return;
+        }
+    }
+    return o;
+}
 
-  var val = ( typeof val === 'object' || Array.isArray(val) )
-          ? JSON.stringify(val)
-          : val
+function set(path, value) {
+  if ( path.indexOf('.') !== -1 ) {
+    var obj = {}
+    var firstKey = path.split('.')[0]
+    setValue(obj, path, value)
+    localStorage[firstKey] = JSON.stringify(obj[firstKey])
+  } else {
+    localStorage[path] = JSON.stringify(value)
+  }
+}
 
-  localStorage.setItem( key, val )
-
+function get(path) {
+  if ( path.indexOf('.') !== -1 ) {
+    var obj = JSON.parse(localStorage[path.split('.')[0]])
+    var path = path.split('.').slice(1).join('.')
+    return getValue( obj, path ) // JSON.parse(getValue( obj, path ))
+  } else {
+    return JSON.parse(getValue( localStorage, path))
+  }
 }
 
 function has(str) {
-
   return ( get(str) ) ? true : false
-
 }
 
 function remove() {
@@ -57,9 +68,11 @@ function clear() {
 }
 
 module.exports = {
+  localStorage: localStorage,
   get: get,
   set: set,
   has: has,
   remove: remove,
   clear: clear
 }
+
