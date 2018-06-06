@@ -1,6 +1,6 @@
 {
   "name": "localstorage-api",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "> Access local storage with dot notation (e.g. `ls.get('some.object.here')`)",
   "main": "index.js",
   "scripts": {
