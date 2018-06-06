@@ -1,4 +1,4 @@
-var localStorage = {}
+var localStorage = window.localStorage || {}
 
 // http://stackoverflow.com/a/20240290/2102042
 function setValue(object, path, value) {
