@@ -1,78 +1,93 @@
-var localStorage = window.localStorage || {}
-
 // http://stackoverflow.com/a/20240290/2102042
-function setValue(object, path, value) {
-    var a = path.split('.');
-    var o = object;
-    for (var i = 0; i < a.length - 1; i++) {
-        var n = a[i];
-        if (n in o) {
-            o = o[n];
-        } else {
-            o[n] = {};
-            o = o[n];
-        }
+var setValue = (object, path, value) => {
+  var a = path.split('.')
+  var o = object
+  for (var i = 0; i < a.length - 1; i++) {
+    var n = a[i]
+    if (n in o) {
+      o = o[n]
+    } else {
+      o[n] = {}
+      o = o[n]
     }
-    o[a[a.length - 1]] = value;
+  }
+  o[a[a.length - 1]] = value
 }
 
 // http://stackoverflow.com/a/20240290/2102042
-function getValue(object, path) {
-    var o = object;
-    path = path.replace(/\[(\w+)\]/g, '.$1');
-    path = path.replace(/^\./, '');
-    var a = path.split('.');
-    while (a.length) {
-        var n = a.shift();
-        if (n in o) {
-            o = o[n];
-        } else {
-            return;
-        }
+var getValue = (object, path) => {
+  var o = object
+  path = path.replace(/\[(\w+)\]/g, '.$1')
+  path = path.replace(/^\./, '')
+  var a = path.split('.')
+  while (a.length) {
+    var n = a.shift()
+    if (n in o) {
+      o = o[n]
+    } else {
+      return
     }
-    return o;
+  }
+  return o
 }
 
-function set(path, value) {
+var get = path => {
+
   if ( path.indexOf('.') !== -1 ) {
+
+    var lsPath = path.split('.')[0]
+
+    if ( localStorage[lsPath] === undefined ) {
+      return null
+    } else {
+      let obj = JSON.parse(localStorage[lsPath])
+      let objPath = path.split('.').slice(1).join('.')
+      return getValue( obj, objPath )
+    }
+
+  } else {
+    try {
+      return JSON.parse(localStorage[path])
+    } catch (err) {
+      return localStorage[path]
+    }
+  }
+
+}
+
+var set = (path, value) => {
+
+  if ( path.indexOf('.') !== -1 ) {
+
+    var lsPath = path.split('.')[0]
     var obj = {}
-    var firstKey = path.split('.')[0]
-    setValue(obj, path, value)
-    localStorage[firstKey] = JSON.stringify(obj[firstKey])
+
+    try {
+      obj = JSON.parse(localStorage[lsPath])
+    } catch (err) {}
+
+    var objPath = path.split('.').slice(1).join('.')
+
+    setValue(obj, objPath, value)
+
+    localStorage[lsPath] = JSON.stringify(obj)
+
   } else {
-    localStorage[path] = JSON.stringify(value)
+    localStorage[path] = (typeof value === 'object') ? JSON.stringify(value) : value
   }
+
 }
 
-function get(path) {
-  if ( path.indexOf('.') !== -1 ) {
-    var obj = JSON.parse(localStorage[path.split('.')[0]])
-    var path = path.split('.').slice(1).join('.')
-    return getValue( obj, path ) // JSON.parse(getValue( obj, path ))
-  } else {
-    return JSON.parse(getValue( localStorage, path))
-  }
-}
+var has = str => !!get(str)
 
-function has(str) {
-  return ( get(str) ) ? true : false
-}
+var remove = (...args) => { args.forEach(item => { localStorage.removeItem(item) }) }
 
-function remove() {
-  var args = Array.prototype.slice.call(arguments)
-  args.forEach(function(item) { localStorage.removeItem(item) })
-}
-
-function clear() {
-  localStorage.clear()
-}
+var clear = () => { localStorage.clear() }
 
 module.exports = {
-  localStorage: localStorage,
   get: get,
   set: set,
   has: has,
   remove: remove,
   clear: clear
 }
-
