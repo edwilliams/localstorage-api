@@ -1,3 +1,14 @@
+**_👀👉This repo is unmaintained!👈👀:_**
+
+_If anyone fancies it, I reckon it could be improved by using [Lodash](https://lodash.com/docs#get), like so:_
+
+```
+localStorage.foo = '{"bar":"buzz"}'
+_.get(JSON.parse(localStorage.foo), 'bar')
+```
+
+---
+
 # localStorage API
 
 > Access local storage with a dot notation (e.g. `ls.get('some.object.here')`)
@@ -22,9 +33,9 @@ To set a simple key / value in localStorage:
 
 If you check the browsers localStorage you will now see
 
-| key    | value                |
-|--------|----------------------|
-| `some` | `{ "object": 123 }`  |
+| key    | value               |
+| ------ | ------------------- |
+| `some` | `{ "object": 123 }` |
 
 #### Get
 
@@ -38,6 +49,7 @@ ls.get('some.object') // => 123`
 #### Has
 
 To check a value:
+
 ```
 ls.has('some')        // => true
 ls.has('some.object') // => true
